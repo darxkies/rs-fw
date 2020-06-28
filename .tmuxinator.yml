@@ -1,0 +1,9 @@
+name: rs-fw
+
+windows:
+  - editor:
+      layout: main-horizontal
+      panes:
+        - vim
+        - make watch-and-compile
+  - shell: 
