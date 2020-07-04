@@ -4,7 +4,28 @@ use std::sync::Arc;
 use actix_rt::System;
 use actix_web::{middleware, web, App, HttpServer};
 use actix_web;
-use anyhow::Context;
+use anyhow::{Context};
+
+
+#[derive(Debug)]
+struct AnyhowError {
+   error: anyhow::Error
+}
+
+impl actix_web::error::ResponseError for AnyhowError {
+}
+
+impl std::fmt::Display for AnyhowError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.error.to_string())
+    }
+}
+
+impl From<anyhow::Error> for AnyhowError {
+    fn from(error: anyhow::Error) -> AnyhowError {
+        AnyhowError { error }
+    }
+}
 
 #[allow(dead_code)]
 #[derive(Clone)]
@@ -18,10 +39,14 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> A
   }
 
   async fn index(_data: web::Data<Arc<L>>) -> actix_web::Result<String> {
-      match _data.external_ip().get().await {
+      match _data.external_ip()
+        .map_err(|error| AnyhowError{error})?
+        .get().await {
         Ok(ip) => return Ok(format!("External IP: {}", ip)),
         Err(error) => {
-          _data.log().error(format!("Could not get IP: {}", error.to_string()));
+          _data.log()
+            .map_err(|error| AnyhowError{error})?
+            .error(format!("Could not get IP: {}", error.to_string()));
 
           return Ok("No external IP found!".to_string());
         }
@@ -35,7 +60,7 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> W
 
     let data: Arc<L>  = Arc::new(self.container.clone());
 
-    let address = self.container.config().get().web_listener.clone();
+    let address = self.container.config()?.get().web_listener.clone();
 
     HttpServer::new(move || {
       App::new()
@@ -49,7 +74,7 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> W
 
     sys.run()?;
 
-    self.container.log().info("Server killed".to_string());
+    self.container.log()?.info("Server killed".to_string());
 
     Ok(())
   }

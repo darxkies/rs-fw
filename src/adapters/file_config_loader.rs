@@ -20,7 +20,7 @@ impl<T: GetConfigFilename> FileConfigLoader <T>{
 
 impl<T: GetConfigFilename> ConfigLoader for FileConfigLoader<T> {
     fn load(&self, config: &mut Config) -> VoidResult {
-        let filename = self.container.config_filename().get();
+        let filename = self.container.config_filename()?.get();
 
         let content = fs::read_to_string(&filename)
           .with_context(|| Error::ReadFile(filename.clone()))?;

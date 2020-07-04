@@ -12,7 +12,7 @@ pub struct FileConfig<L: GetConfigRefresher + GetLogger> {
 
 impl<L: GetConfigRefresher + GetLogger> FileConfig<L> {
   pub fn new(container: L) -> Result<Arc<Self>> {
-    let config = container.config_refresher().load()?;
+    let config = container.config_refresher()?.load()?;
 
     Ok(Arc::new(Self {
       container: container,

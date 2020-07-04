@@ -28,9 +28,9 @@ container!(Container, // Container Name
 fn run() -> VoidResult {
   let _container = Container::new()?;
 
-  _container.log().info(format!("{} {}", NAME, VERSION));
+  _container.log()?.info(format!("{} {}", NAME, VERSION));
 
-  _container.web_service().run()?;
+  _container.web_service()?.run()?;
 
   Ok(())
 }

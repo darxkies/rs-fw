@@ -20,7 +20,7 @@ impl<L: GetLogger + GetDownloader + Send + Sync> IpifyExternalIP<L> {
 #[async_trait]
 impl<L: GetLogger + GetDownloader + Send + Sync> ExternalIP for IpifyExternalIP<L> {
   async fn get(&self) -> Result<String> {
-    self.container.downloader().get_string(&"https://api.ipify.org".to_string()).await 
+    self.container.downloader()?.get_string(&"https://api.ipify.org".to_string()).await 
   }
 }
 

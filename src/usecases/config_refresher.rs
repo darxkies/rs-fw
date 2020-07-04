@@ -21,12 +21,12 @@ impl<T: GetConfigFilename + GetConfigLoader + GetConfigSaver> ConfigRefresher fo
     fn load(&self) -> Result<Config> {
       let mut config = Config::default();
 
-      let filename = self.container.config_filename().get();
+      let filename = self.container.config_filename()?.get();
 
       if Path::new(&filename).exists() {
-        self.container.config_loader().load(&mut config)?;
+        self.container.config_loader()?.load(&mut config)?;
       } else {
-        self.container.config_saver().save(&config)?;
+        self.container.config_saver()?.save(&config)?;
       }
        
       Ok(config)

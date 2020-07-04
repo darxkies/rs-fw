@@ -4,7 +4,7 @@
 macro_rules! Getter {
   ($name:ident, $method:ident, $interface:ident) => {
     pub trait $name {
-      fn $method(&self) -> std::sync::Arc<dyn $interface + Send + Sync>;
+      fn $method(&self) -> crate::models::Result<std::sync::Arc<dyn $interface + Send + Sync>>;
     }
   }
 }
@@ -33,8 +33,8 @@ macro_rules! container {
 
     $(
       impl $getter_interface for Arc<std::sync::Mutex<$container_name>> {
-        fn $method(&self) -> Arc<dyn $interface + Send + Sync> {
-          self.lock().unwrap().$method.as_ref().clone().unwrap().clone()
+        fn $method(&self) -> crate::models::Result<Arc<dyn $interface + Send + Sync>> {
+          Ok(self.lock().unwrap().$method.as_ref().clone().unwrap().clone())
         }
       }
     )*

@@ -20,7 +20,7 @@ impl<T: GetConfigFilename> FileConfigSaver<T> {
 
 impl<T: GetConfigFilename> ConfigSaver for FileConfigSaver<T> {
     fn save(&self, config: &Config) -> VoidResult {
-        let filename = self.container.config_filename().get();
+        let filename = self.container.config_filename()?.get();
 
         let content = serde_yaml::to_string(config)
           .with_context(|| Error::YamlSerializeFile(filename.clone()))?;

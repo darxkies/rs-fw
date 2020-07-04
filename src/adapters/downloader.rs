@@ -23,7 +23,7 @@ impl<L: GetLogger + Sync> Downloader for HttpDownloader<L> {
     let result = reqwest::get(url).await?
       .text().await?;
 
-    self.container.log().info(format!("url: {} / response: {}", url, &result));
+    self.container.log()?.info(format!("url: {} / response: {}", url, &result));
 
     Ok(result)
   }
