@@ -4,6 +4,7 @@ use std::sync::Arc;
 use actix_rt::System;
 use actix_web::{middleware, web, App, HttpServer};
 use actix_web;
+use anyhow::Context;
 
 #[allow(dead_code)]
 #[derive(Clone)]
@@ -43,7 +44,7 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> W
           .route("/", web::get().to(ActixWebService::<L>::index))
     })
     .bind(&address)
-          .map_err(|error| ErrorKind::Wrapper(format!("Could not start server using '{}'", &address), error.to_string()))?
+          .with_context(|| Error::Bind(address))?
     .run();
 
     sys.run()?;

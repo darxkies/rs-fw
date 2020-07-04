@@ -1,4 +1,5 @@
 use crate::models::*;
+use anyhow::Context;
 use crate::interfaces::*;
 use std::sync::Arc;
 use std::fs;
@@ -22,10 +23,10 @@ impl<T: GetConfigFilename> ConfigLoader for FileConfigLoader<T> {
         let filename = self.container.config_filename().get();
 
         let content = fs::read_to_string(&filename)
-          .map_err(|error| ErrorKind::Wrapper(format!("Could not read from '{}'", &filename), error.to_string()))?;
+          .with_context(|| Error::ReadFile(filename.clone()))?;
 
         *config = serde_yaml::from_str(&content)
-          .map_err(|error| ErrorKind::Wrapper(format!("Could not deserialize '{}'", &filename), error.to_string()))?;
+          .with_context(|| Error::YamlDeserializeFile(filename.clone()))?;
 
         Ok(())
     }

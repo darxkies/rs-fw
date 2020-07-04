@@ -20,11 +20,11 @@ macro_rules! container {
     }
 
     impl $container_name {
-      pub fn new() -> Result<Arc<std::sync::Mutex<$container_name>>> {
+      pub fn new() -> crate::models::Result<Arc<std::sync::Mutex<$container_name>>> {
         let container = Arc::new(std::sync::Mutex::new($container_name::default()));
 
         $(
-          container.lock()?.$method = Some($component::new(container.clone())?);
+          container.lock().map_err(|_| Error::Lock(stringify!($method).to_string()))?.$method = Some($component::new(container.clone())?);
         )*
 
         Ok(container)

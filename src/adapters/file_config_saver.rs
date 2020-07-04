@@ -1,10 +1,8 @@
 use std::fs;
 use std::sync::Arc;
+use anyhow::Context;
 use crate::interfaces::*;
-use crate::models::Config;
-use crate::models::VoidResult;
-use crate::models::Result;
-use crate::models::ErrorKind;
+use crate::models::*;
 
 #[allow(dead_code)]
 #[derive(Clone)]
@@ -25,10 +23,10 @@ impl<T: GetConfigFilename> ConfigSaver for FileConfigSaver<T> {
         let filename = self.container.config_filename().get();
 
         let content = serde_yaml::to_string(config)
-          .map_err(|error| ErrorKind::Wrapper(format!("Could not serialize '{:?}'", config), error.to_string()))?;
+          .with_context(|| Error::YamlSerializeFile(filename.clone()))?;
 
         fs::write(&filename, &content)
-          .map_err(|error| ErrorKind::Wrapper(format!("Could not write to '{}'", &filename), error.to_string()))?;
+          .with_context(|| Error::WriteFile(filename.clone()))?;
 
         Ok(())
     }

@@ -37,7 +37,7 @@ fn run() -> VoidResult {
 
 fn main() -> VoidResult {
 	if let Err(error) = run() {
-    error!("{}", error);
+    error.chain().for_each(|cause| error!("{}", cause));
 
     std::process::exit(-1);
 	}
