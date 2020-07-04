@@ -17,11 +17,14 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> A
   }
 
   async fn index(_data: web::Data<Arc<L>>) -> actix_web::Result<String> {
-      if let Ok(ip) = _data.external_ip().get().await {
-        return Ok(format!("External IP: {}", ip));
-      }
+      match _data.external_ip().get().await {
+        Ok(ip) => return Ok(format!("External IP: {}", ip)),
+        Err(error) => {
+          _data.log().error(format!("Could not get IP: {}", error.to_string()));
 
-      Ok("No external IP found!".to_string())
+          return Ok("No external IP found!".to_string());
+        }
+      }
   }
 }
 
