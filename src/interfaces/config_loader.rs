@@ -1,9 +1,5 @@
-use crate::models::Config;
-use crate::models::VoidResult;
+use crate::models::*;
 
-Getter!(GetConfigLoader, config_loader, ConfigLoader);
-
-pub trait ConfigLoader {
+component!(GetConfigLoader.config_loader -> ConfigLoader {
     fn load(&self, config: &mut Config) -> VoidResult;
-}
-
+});

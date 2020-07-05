@@ -1,9 +1,4 @@
-use crate::Getter;
-
-// Getter Trait, Getter Method, Component Trait
-Getter!(GetConfigFilename, config_filename, ConfigFilename);
-
-pub trait ConfigFilename {
+component!(GetConfigFilename.config_filename -> ConfigFilename {
   fn get(&self) -> String;
-}
+});
 

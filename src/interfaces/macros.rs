@@ -10,6 +10,19 @@ macro_rules! Getter {
 }
 
 #[macro_export]
+macro_rules! component {
+  ($name:ident . $method:ident -> $interface:ident $body:tt) => {
+    pub trait $name {
+      fn $method(&self) -> crate::models::Result<std::sync::Arc<dyn $interface + Send + Sync>>;
+    }
+
+    #[async_trait::async_trait]
+    pub trait $interface 
+      $body
+  }
+}
+
+#[macro_export]
 macro_rules! container {
   ($container_name:ident, $($getter_interface:ident, $method:ident, $interface:ident, $component:ident)*) => {
     #[derive(Default)]

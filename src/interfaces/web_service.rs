@@ -1,10 +1,5 @@
 use crate::models::*;
-use crate::Getter;
 
-// Getter Trait, Getter Method, Component Trait
-Getter!(GetWebService, web_service, WebService);
-
-pub trait WebService {
+component!(GetWebService.web_service -> WebService {
   fn run(&self) -> VoidResult;
-}
-
+});
