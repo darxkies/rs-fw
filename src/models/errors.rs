@@ -22,6 +22,9 @@ pub enum Error {
 
   #[error("Could not get option '{0}'")]
   Option(String),
+
+  #[error("Could not load file '{0}'")]
+  LoadFile(String),
 }
 
 pub type VoidResult = anyhow::Result<()>;

@@ -5,7 +5,7 @@ use actix_rt::System;
 use actix_web::{middleware, web, App, HttpServer};
 use actix_web;
 use anyhow::{Context};
-
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 #[derive(Debug)]
 struct AnyhowError {
@@ -60,7 +60,25 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> W
 
     let data: Arc<L>  = Arc::new(self.container.clone());
 
-    let address = self.container.config()?.get().web_listener.clone();
+    let address = self.container.config()?.get().web_service_listener.clone();
+    let ca_certificate = self.container.config()?.get().web_service_ssl_ca_certificate.clone();
+    let server_certificate = self.container.config()?.get().web_service_ssl_server_certificate.clone();
+    let server_key = self.container.config()?.get().web_service_ssl_server_key.clone();
+
+    let mut builder = SslAcceptor::mozilla_modern(SslMethod::tls())
+      .context("Could not create ssl acceptor for Actix")?;
+
+    builder
+        .set_ca_file(ca_certificate.clone())
+        .with_context(|| Error::LoadFile(ca_certificate.clone()))?;
+
+    builder
+      .set_certificate_chain_file(server_certificate.clone())
+      .with_context(|| Error::LoadFile(server_certificate.clone()))?;
+
+    builder
+      .set_private_key_file(server_key.clone(), SslFiletype::PEM)
+      .with_context(|| Error::LoadFile(server_key.clone()))?;
 
     HttpServer::new(move || {
       App::new()
@@ -68,7 +86,7 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> W
           .wrap(middleware::Logger::default())
           .route("/", web::get().to(ActixWebService::<L>::index))
     })
-    .bind(&address)
+    .bind_openssl(&address, builder)
           .with_context(|| Error::Bind(address))?
     .run();
 

@@ -5,6 +5,7 @@ authors = ["Darx Kies <darxkies@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+openssl = "0.10"
 clap = "2.33"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
@@ -15,7 +16,7 @@ env_logger = "0.7"
 chrono = "0.4"
 reqwest = { version = "0.10", features = [ "json", "blocking" ] }
 actix-rt = "1"
-actix-web = "2"
+actix-web = { version = "2", features = [ "openssl" ] }
 async-trait = "0.1"
 thiserror = "1.0"
 anyhow = "1.0"
