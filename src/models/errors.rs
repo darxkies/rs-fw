@@ -19,6 +19,9 @@ pub enum Error {
 
   #[error("Could not lock '{0}'")]
   Lock(String),
+
+  #[error("Could not get option '{0}'")]
+  Option(String),
 }
 
 pub type VoidResult = anyhow::Result<()>;

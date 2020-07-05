@@ -24,7 +24,10 @@ macro_rules! container {
         let container = Arc::new(std::sync::Mutex::new($container_name::default()));
 
         $(
-          container.lock().map_err(|_| Error::Lock(stringify!($method).to_string()))?.$method = Some($component::new(container.clone())?);
+          container
+            .lock()
+            .map_err(|_| Error::Lock(stringify!($method).to_string()))?
+            .$method = Some($component::new(container.clone())?);
         )*
 
         Ok(container)
@@ -34,7 +37,15 @@ macro_rules! container {
     $(
       impl $getter_interface for Arc<std::sync::Mutex<$container_name>> {
         fn $method(&self) -> crate::models::Result<Arc<dyn $interface + Send + Sync>> {
-          Ok(self.lock().unwrap().$method.as_ref().clone().unwrap().clone())
+          Ok(self
+            .lock()
+            .map_err(|_| Error::Lock(stringify!($method).to_string()))?
+            .$method
+            .as_ref()
+            .clone()
+            .ok_or_else(|| Error::Option(stringify!($method).to_string()))
+            .unwrap()
+            .clone())
         }
       }
     )*

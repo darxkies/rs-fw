@@ -40,8 +40,8 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> A
 
   async fn index(_data: web::Data<Arc<L>>) -> actix_web::Result<String> {
       match _data.external_ip()
-        .map_err(|error| AnyhowError{error})?
-        .get().await {
+          .map_err(|error| AnyhowError{error})?
+          .get().await {
         Ok(ip) => return Ok(format!("External IP: {}", ip)),
         Err(error) => {
           _data.log()
