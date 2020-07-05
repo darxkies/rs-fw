@@ -24,7 +24,7 @@ macro_rules! component {
 
 #[macro_export]
 macro_rules! container {
-  ($container_name:ident, $($getter_interface:ident, $method:ident, $interface:ident, $component:ident)*) => {
+  ($container_name:ident, $($getter_interface:ident . $method:ident -> $interface:ident = $component:ident)*) => {
     #[derive(Default)]
     struct $container_name {
       $(

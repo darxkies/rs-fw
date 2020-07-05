@@ -14,15 +14,15 @@ use std::sync::*;
 
 container!(Container, // Container Name
   // Getter Trait, Getter Method, Component Trait, Component Implementation
-  GetLogger, log, Logger, Log
-  GetConfigFilename, config_filename, ConfigFilename, ProgramArguments
-  GetConfigLoader, config_loader, ConfigLoader, FileConfigLoader
-  GetConfigSaver, config_saver, ConfigSaver, FileConfigSaver
-  GetConfigRefresher, config_refresher, ConfigRefresher, FileConfigRefresher
-  GetConfig, config, Configer, FileConfig
-  GetDownloader, downloader, Downloader, HttpDownloader
-  GetExternalIP, external_ip, ExternalIP, IpifyExternalIP
-  GetWebService, web_service, WebService, ActixWebService
+  GetLogger.log -> Logger = Log
+  GetConfigFilename.config_filename -> ConfigFilename = ProgramArguments
+  GetConfigLoader.config_loader -> ConfigLoader = FileConfigLoader
+  GetConfigSaver.config_saver -> ConfigSaver = FileConfigSaver
+  GetConfigRefresher.config_refresher -> ConfigRefresher = FileConfigRefresher
+  GetConfig.config -> Configer = FileConfig
+  GetDownloader.downloader -> Downloader = HttpDownloader
+  GetExternalIP.external_ip -> ExternalIP = IpifyExternalIP
+  GetWebService.web_service -> WebService = ActixWebService
 );
 
 fn run() -> VoidResult {
