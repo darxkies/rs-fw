@@ -1,15 +1,6 @@
 #![macro_use] 
 
 #[macro_export]
-macro_rules! Getter {
-  ($name:ident, $method:ident, $interface:ident) => {
-    pub trait $name {
-      fn $method(&self) -> crate::models::Result<std::sync::Arc<dyn $interface + Send + Sync>>;
-    }
-  }
-}
-
-#[macro_export]
 macro_rules! component {
   ($name:ident . $method:ident -> $interface:ident $body:tt) => {
     pub trait $name {

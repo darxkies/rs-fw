@@ -1,8 +1,8 @@
 #[allow(dead_code)]
 pub mod models;
-pub mod interfaces;
 pub mod adapters;
 pub mod usecases;
+pub mod interfaces;
 
 use log::error;
 use models::*;
