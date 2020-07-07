@@ -1,18 +1,16 @@
-#[allow(dead_code)]
 pub mod models;
+pub mod interfaces;
 pub mod adapters;
 pub mod usecases;
-pub mod interfaces;
 
-use log::error;
-use models::*;
-use interfaces::*;
-use adapters::*;
-use usecases::*;
+pub use models::*;
+pub use interfaces::*;
+pub use usecases::*;
+pub use adapters::*;
 
-use std::sync::*;
+use std::sync::Arc;
 
-container!(Container, // Container Name
+macros::container!(Container, // Container Name
   // Getter Trait, Getter Method, Component Trait, Component Implementation
   GetLogger.log -> Logger = Log
   GetConfigFilename.config_filename -> ConfigFilename = ProgramArguments
@@ -25,22 +23,3 @@ container!(Container, // Container Name
   GetWebService.web_service -> WebService = ActixWebService
 );
 
-fn run() -> VoidResult {
-  let _container = Container::new()?;
-
-  _container.log()?.info(format!("{} {}", NAME, VERSION));
-
-  _container.web_service()?.run()?;
-
-  Ok(())
-}
-
-fn main() -> VoidResult {
-	if let Err(error) = run() {
-    error.chain().for_each(|cause| error!("{}", cause));
-
-    std::process::exit(-1);
-	}
-
-  Ok(())
-}

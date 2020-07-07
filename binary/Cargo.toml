@@ -1,0 +1,10 @@
+[package]
+name = "binary"
+version = "0.1.0"
+authors = ["Darx Kies <darxkies@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+macros = { path = "../macros" }
+library = { path = "../library" }
+log = "0.4"

@@ -17,7 +17,7 @@ macro_rules! component {
 macro_rules! container {
   ($container_name:ident, $($getter_interface:ident . $method:ident -> $interface:ident = $component:ident)*) => {
     #[derive(Default)]
-    struct $container_name {
+    pub struct $container_name {
       $(
         $method: Option<Arc<dyn $interface + Send + Sync>>,
       )*
@@ -55,4 +55,3 @@ macro_rules! container {
     )*
   }
 }
-

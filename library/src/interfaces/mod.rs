@@ -1,5 +1,3 @@
-pub mod macros;
-
 pub mod logger;
 pub use logger::*;
 
