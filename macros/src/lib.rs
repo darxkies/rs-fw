@@ -47,8 +47,7 @@ macro_rules! container {
             .$method
             .as_ref()
             .clone()
-            .ok_or_else(|| Error::Option(stringify!($method).to_string()))
-            .unwrap()
+            .ok_or_else(|| Error::Option(stringify!($method).to_string()))?
             .clone())
         }
       }
