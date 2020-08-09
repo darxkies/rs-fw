@@ -2,7 +2,7 @@ use log::error;
 use library::*;
 
 fn run() -> VoidResult {
-  let _container = Container::new()?;
+  let _container = MainContainer::new()?;
 
   _container.log()?.info(format!("{} {}", NAME, VERSION));
 

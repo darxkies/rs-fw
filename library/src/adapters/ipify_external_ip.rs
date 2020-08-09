@@ -3,14 +3,13 @@ use crate::interfaces::*;
 use std::sync::Arc;
 use async_trait::async_trait;
 
-#[allow(dead_code)]
 #[derive(Clone)]
-pub struct IpifyExternalIP<L: GetLogger + GetDownloader + Sync> {
-  container: L,
+pub struct IpifyExternalIP {
+  container: Arc<dyn Container + Send + Sync>,
 }
 
-impl<L: GetLogger + GetDownloader + Send + Sync> IpifyExternalIP<L> {
-  pub fn new(container: L) -> Result<Arc<Self>> {
+impl IpifyExternalIP {
+  pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     Ok(Arc::new(Self {
       container: container,
     }))
@@ -18,7 +17,7 @@ impl<L: GetLogger + GetDownloader + Send + Sync> IpifyExternalIP<L> {
 }
 
 #[async_trait]
-impl<L: GetLogger + GetDownloader + Send + Sync> ExternalIP for IpifyExternalIP<L> {
+impl ExternalIP for IpifyExternalIP {
   async fn get(&self) -> Result<String> {
     self.container.downloader()?.get_string(&"https://api.ipify.org".to_string()).await 
   }

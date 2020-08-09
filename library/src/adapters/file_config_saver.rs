@@ -4,21 +4,20 @@ use anyhow::Context;
 use crate::interfaces::*;
 use crate::models::*;
 
-#[allow(dead_code)]
 #[derive(Clone)]
-pub struct FileConfigSaver<T: GetConfigFilename> {
-  container: T,
+pub struct FileConfigSaver {
+  container: Arc<dyn Container + Send + Sync>,
 }
 
-impl<T: GetConfigFilename> FileConfigSaver<T> {
-  pub fn new(container: T) -> Result<Arc<Self>> {
+impl FileConfigSaver {
+  pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     Ok(Arc::new(Self {
       container: container,
     }))
   }
 }
 
-impl<T: GetConfigFilename> ConfigSaver for FileConfigSaver<T> {
+impl ConfigSaver for FileConfigSaver {
     fn save(&self, config: &Config) -> VoidResult {
         let filename = self.container.config_filename()?.get();
 

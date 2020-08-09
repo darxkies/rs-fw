@@ -4,20 +4,20 @@ use std::sync::Arc;
 use std::path::Path;
 
 #[allow(dead_code)]
-#[derive(Debug, Clone)]
-pub struct FileConfigRefresher<T: GetConfigFilename + GetConfigLoader + GetConfigSaver> {
-  container: T,
+#[derive(Clone)]
+pub struct FileConfigRefresher {
+  container: Arc<dyn Container + Send + Sync>,
 }
 
-impl<T: GetConfigFilename + GetConfigLoader + GetConfigSaver> FileConfigRefresher <T>{
-  pub fn new(container: T) -> Result<Arc<Self>> {
+impl FileConfigRefresher {
+  pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     Ok(Arc::new(Self {
       container: container,
     }))
   }
 }
 
-impl<T: GetConfigFilename + GetConfigLoader + GetConfigSaver> ConfigRefresher for FileConfigRefresher<T> {
+impl ConfigRefresher for FileConfigRefresher {
     fn load(&self) -> Result<Config> {
       let mut config = Config::default();
 

@@ -3,14 +3,13 @@ use crate::interfaces::*;
 use std::sync::Arc;
 use async_trait::async_trait;
 
-#[allow(dead_code)]
 #[derive(Clone)]
-pub struct HttpDownloader<L: GetLogger + Sync> {
-  container: L,
+pub struct HttpDownloader {
+  container: Arc<dyn Container + Send + Sync>,
 }
 
-impl<L: GetLogger + Sync> HttpDownloader<L> {
-  pub fn new(container: L) -> Result<Arc<Self>> {
+impl HttpDownloader {
+  pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     Ok(Arc::new(Self {
       container: container,
     }))
@@ -18,7 +17,7 @@ impl<L: GetLogger + Sync> HttpDownloader<L> {
 }
 
 #[async_trait]
-impl<L: GetLogger + Sync> Downloader for HttpDownloader<L> {
+impl Downloader for HttpDownloader {
   async fn get_string(&self, url: &String) -> Result<String> {
     let result = reqwest::get(url).await?
       .text().await?;

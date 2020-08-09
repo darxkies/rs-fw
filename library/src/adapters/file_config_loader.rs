@@ -4,21 +4,20 @@ use crate::interfaces::*;
 use std::sync::Arc;
 use std::fs;
 
-#[allow(dead_code)]
 #[derive(Clone)]
-pub struct FileConfigLoader<T: GetConfigFilename> {
-  container: T,
+pub struct FileConfigLoader {
+  container: Arc<dyn Container + Send + Sync>,
 }
 
-impl<T: GetConfigFilename> FileConfigLoader <T>{
-  pub fn new(container: T) -> Result<Arc<Self>> {
+impl FileConfigLoader {
+  pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     Ok(Arc::new(Self {
       container: container,
     }))
   }
 }
 
-impl<T: GetConfigFilename> ConfigLoader for FileConfigLoader<T> {
+impl ConfigLoader for FileConfigLoader {
     fn load(&self, config: &mut Config) -> VoidResult {
         let filename = self.container.config_filename()?.get();
 

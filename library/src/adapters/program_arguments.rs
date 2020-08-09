@@ -9,15 +9,14 @@ pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const CONFIG: &str = "config";
 const DEFAULT_CONFIG_FILENAME: &str = "config.yaml";
 
-#[allow(dead_code)]
 #[derive(Clone)]
-pub struct ProgramArguments<L> {
-  container: L,
+pub struct ProgramArguments {
+  container: Arc<dyn Container + Send + Sync>,
   config_filename: String,
 }
 
-impl<L> ProgramArguments<L> {
-  pub fn new(container: L) -> Result<Arc<Self>> {
+impl ProgramArguments {
+  pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     let matches = App::new(NAME)
         .version(VERSION)
         .author("Darx Kies <darxkies@gmail.com>")
@@ -41,7 +40,7 @@ impl<L> ProgramArguments<L> {
   }
 }
 
-impl<L> ConfigFilename for ProgramArguments<L> {
+impl ConfigFilename for ProgramArguments {
   fn get(&self) -> String {
     self.config_filename.clone()
   }

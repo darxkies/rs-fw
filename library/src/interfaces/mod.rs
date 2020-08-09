@@ -24,3 +24,6 @@ pub use web_service::*;
 
 pub mod external_ip;
 pub use external_ip::*;
+
+pub mod container;
+pub use container::*;

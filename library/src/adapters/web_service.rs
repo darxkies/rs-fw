@@ -27,38 +27,37 @@ impl From<anyhow::Error> for AnyhowError {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Clone)]
-pub struct ActixWebService<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> {
-  container: L,
+pub struct ActixWebService {
+  container: Arc<dyn Container + Send + Sync>,
 }
 
-impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> ActixWebService<L> {
-  pub fn new(container: L) -> Result<Arc<Self>> {
+impl ActixWebService {
+  pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     Ok(Arc::new(ActixWebService{container:  container}))
   }
 
-  async fn index(_data: web::Data<Arc<L>>) -> actix_web::Result<String> {
-      match _data.external_ip()
+  async fn index(_data: web::Data<Arc<dyn Container + Send + Sync>>) -> actix_web::Result<String> {
+    match _data.external_ip()
+        .map_err(|error| AnyhowError{error})?
+        .get().await {
+      Ok(ip) => return Ok(format!("External IP: {}", ip)),
+      Err(error) => {
+        _data.log()
           .map_err(|error| AnyhowError{error})?
-          .get().await {
-        Ok(ip) => return Ok(format!("External IP: {}", ip)),
-        Err(error) => {
-          _data.log()
-            .map_err(|error| AnyhowError{error})?
-            .error(format!("Could not get IP: {}", error.to_string()));
+          .error(format!("Could not get IP: {}", error.to_string()));
 
-          return Ok("No external IP found!".to_string());
-        }
+        return Ok("No external IP found!".to_string());
       }
+    }
   }
 }
 
-impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> WebService for ActixWebService<L> {
+impl WebService for ActixWebService {
   fn run(&self) -> VoidResult {
     let sys = System::new("web-service");
 
-    let data: Arc<L>  = Arc::new(self.container.clone());
+    let data: Arc<dyn Container + Send + Sync>  = self.container.clone();
 
     let address = self.container.config()?.get().web_service_listener.clone();
     let ca_certificate = self.container.config()?.get().web_service_ssl_ca_certificate.clone();
@@ -84,7 +83,7 @@ impl<L: GetLogger + GetConfig + GetExternalIP + Sync + Clone + Send + 'static> W
       App::new()
           .data(data.clone())
           .wrap(middleware::Logger::default())
-          .route("/", web::get().to(ActixWebService::<L>::index))
+          .route("/", web::get().to(ActixWebService::index))
     })
     .bind_openssl(&address, builder)
           .with_context(|| Error::Bind(address))?

@@ -9,14 +9,15 @@ use std::io::Write;
 use crate::interfaces::Logger;
 use std::sync::Arc;
 use crate::models::Result;
+use crate::interfaces::*;
 
-#[derive(Copy, Clone)]
-pub struct Log<T> {
-  container: T
+#[derive(Clone)]
+pub struct Log {
+  container: Arc<dyn Container + Send + Sync>
 }
 
-impl<T> Log<T> {
-	pub fn new(container: T) -> Result<Arc<Self>> {
+impl Log {
+	pub fn new(container: Arc<dyn Container + Send + Sync>) -> Result<Arc<Self>> {
     if let Err(_) = std::env::var(DEFAULT_FILTER_ENV) {
       std::env::set_var(DEFAULT_FILTER_ENV, LevelFilter::Info.to_string());
     }
@@ -37,7 +38,7 @@ impl<T> Log<T> {
 	}
 }
 
-impl<T> Logger for Log<T> {
+impl Logger for Log {
 	fn info(&self, message: String) {
 		info!("{}", &message);
 	}

@@ -15,7 +15,7 @@ macro_rules! component {
 
 #[macro_export]
 macro_rules! container {
-  ($container_name:ident, $($getter_interface:ident . $method:ident -> $interface:ident = $component:ident)*) => {
+  ($container_name:ident, $($method:ident -> $interface:ident = $component:ident)*) => {
     #[derive(Default)]
     pub struct $container_name {
       $(
@@ -38,8 +38,8 @@ macro_rules! container {
       }
     }
 
-    $(
-      impl $getter_interface for Arc<std::sync::Mutex<$container_name>> {
+    impl Container for std::sync::Mutex<$container_name>{
+      $(
         fn $method(&self) -> crate::models::Result<Arc<dyn $interface + Send + Sync>> {
           Ok(self
             .lock()
@@ -50,7 +50,18 @@ macro_rules! container {
             .ok_or_else(|| Error::Option(stringify!($method).to_string()))?
             .clone())
         }
-      }
-    )*
+      )*
+    }
+  }
+}
+
+#[macro_export]
+macro_rules! container_trait {
+  ($($method:ident -> $interface:ident)*) => {
+    pub trait Container {
+      $(
+        fn $method(&self) -> crate::models::Result<Arc<dyn $interface + Send + Sync>>;
+      )*
+    }
   }
 }
